@@ -12,10 +12,10 @@ def load_img(img_path):
 		out_np = np.tile(out_np[:,:,None],3)
 	return out_np
 
-def resize_img(img, HW=(256,256), resample=3):
+def resize_img(img, HW=(64,64), resample=3):
 	return np.asarray(Image.fromarray(img).resize((HW[1],HW[0]), resample=resample))
 
-def preprocess_img(img_rgb_orig, HW=(256,256), resample=3):
+def preprocess_img(img_rgb_orig, HW=(64,64), resample=3):
 	# return original size L and resized L as torch Tensors
 	img_rgb_rs = resize_img(img_rgb_orig, HW=HW, resample=resample)
 	
