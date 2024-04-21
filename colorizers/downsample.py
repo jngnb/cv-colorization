@@ -45,7 +45,7 @@ ab_directory = 'kaggle_images/ab/ab/ab'
 # np.save('kaggle_images/ab_downsampled/ab.npy', downsampled_ab)
 
 images_gray = np.load('kaggle_images/l/gray_scale.npy')
-images_ab = np.load('kaggle_images/ab/ab/ab1.npy')
+images_ab = np.load('kaggle_images/ab/ab/ab3.npy')
 
 gray_array = []
 ab_array = []
