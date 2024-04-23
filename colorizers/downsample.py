@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from skimage.color import lab2rgb
 # from .load_data import *
 # Set the directory where your images are located
 l_directory = 'kaggle_images/l/gray_scale.npy'
@@ -45,11 +46,13 @@ ab_directory = 'kaggle_images/ab/ab/ab'
 # np.save('kaggle_images/ab_downsampled/ab.npy', downsampled_ab)
 
 images_gray = np.load('kaggle_images/l/gray_scale.npy')
-images_ab = np.load('kaggle_images/ab/ab/ab3.npy')
+image_gray = images_gray[0]
+print(image_gray)
+images_ab = np.load('kaggle_images/ab/ab/ab1.npy')
 
 gray_array = []
 ab_array = []
-for i in range(len(images_ab)):
+for i in range(1000):
     image_gray = images_gray[i]
     image_ab = images_ab[i]
 
@@ -59,24 +62,36 @@ for i in range(len(images_ab)):
     img = np.zeros((224, 224, 3))
     img[:, :, 0] = image_gray
     img[:, :, 1:] = image_ab
+    # print(f'gray_array: {np.min(img[:, :, 0]), np.max(img[:, :, 0])}')
+    # print(f'a_channel: {np.min(img[:, :, 1]), np.max(img[:, :, 1])}')
+    # print(f'b_channel: {np.min(img[:, :, 2]), np.max(img[:, :, 2])}')
 
-    size = (64, 64)
+    size = (64, 64)   
     img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
-    image_gray = cv2.resize(image_gray, size, interpolation=cv2.INTER_AREA)
+    # image_gray = cv2.resize(image_gray, size, interpolation=cv2.INTER_AREA)
 
-    img = img.astype('uint8')
+    # img = img.astype('uint8')
 
-    img_ = cv2.cvtColor(img, cv2.COLOR_LAB2RGB)
-    gray_array.append(image_gray)
-    ab_array.append(img_)
+    # img_ = cv2.cvtColor(img, cv2.COLOR_LAB2RGB)
+    gray_array.append(img[:, :, 0])
+    ab_array.append(img[:, :, 1:])
+    # print(f'gray_array: {min(image_gray), max(image_gray)}')
+    # print(f'ab_array: {min(image_ab), max(image_ab)}')
+    # plt.imshow(img[:, :, 0], cmap='gray')
+    # plt.show()
+
+    # img = cv2.cvtColor(img, cv2.COLOR_LAB2RGB)
+    # print(img[0, :, 1:])
+    # rgb_image = lab2rgb(img)
+    # plt.imshow(img)
+    # plt.show()
+
 
 # print('Gray scale image')
 gray_array = np.array(gray_array)
 ab_array = np.array(ab_array)
 np.save(f'data/grayscale_downsampled/grayscale', gray_array)
 np.save(f'data/true_color_downsampled/color', ab_array)
-    # plt.imshow(image_gray)
-    # plt.show()
 
 # print('Recreated image')
 # plt.imshow(img_)

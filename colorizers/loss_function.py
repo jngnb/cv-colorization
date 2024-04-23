@@ -48,15 +48,21 @@ def lab_to_rgb(lab_images):
 # Define LPIPS loss function
 lpips_loss = LPIPS(net='vgg', verbose=True)
 
-colorized_lab_images = torch.tensor(np.array([cv2.imread('imgs/ansel_adams.jpg')]))
-colorized_lab_images = colorized_lab_images.permute(0, 3, 1, 2)
-print(colorized_lab_images.max())
-colorized_lab_images = colorized_lab_images / 127.5 - 1.0
-print(colorized_lab_images.shape)
+# Test images
 
-ground_truth_lab_images = torch.tensor(np.array([cv2.imread('imgs_out/ansel_adams_colorized_eccv16.png')]))
-ground_truth_lab_images = ground_truth_lab_images.permute(0, 3, 1, 2)
-ground_truth_lab_images = ground_truth_lab_images / 127.5 - 1.0
+img1_rgb = cv2.imread('imgs/ansel_adams.jpg')
+img1_rgb = cv2.resize(img1_rgb, (64, 64), interpolation=cv2.INTER_AREA)
+img1_rgb = torch.tensor(np.array([img1_rgb]))
+img1_rgb = img1_rgb.permute(0, 3, 1, 2)
+img1_rgb = img1_rgb / 255.0
+print(img1_rgb)
+
+img2_rgb = cv2.imread('imgs_out/ansel_adams_colorized_eccv16.png')
+img2_rgb = cv2.resize(img2_rgb, (64, 64), interpolation=cv2.INTER_AREA)
+img2_rgb = torch.tensor(np.array([img2_rgb]))
+img2_rgb = img2_rgb.permute(0, 3, 1, 2)
+img2_rgb = img2_rgb / 255.0
+print(img2_rgb)
 
 
 # Assuming you have tensors `colorized_lab_images` and `ground_truth_rgb_images`
@@ -65,13 +71,16 @@ ground_truth_lab_images = ground_truth_lab_images / 127.5 - 1.0
 
 # breakpoint()
 
-print('lab to rgb')
 # Convert LAB images to RGB
-colorized_rgb_images = lab_to_rgb(colorized_lab_images)
-print('done')
+# Only for actual outputs that are in lab
+
+# colorized_rgb_images = lab_to_rgb(colorized_lab_images)
+# ground_truth_lab_images = lab_to_rgb(ground_truth_lab_images)
+
+# breakpoint()
 
 # Calculate LPIPS loss
-lpips_loss_value = lpips_loss.forward(colorized_rgb_images, ground_truth_lab_images)
+lpips_loss_value = lpips_loss.forward(img1_rgb, img2_rgb, normalize=True)
 
 # Print the LPIPS loss value
 print("LPIPS Loss:", lpips_loss_value.item())

@@ -21,8 +21,8 @@ class LabDataset(Dataset):
         img_ab = self.ab_images[idx]
 
         # Normalize the L and ab channels
-        img_l = (img_l - 50.) / 100.  # Assuming L in [0, 100]
-        img_ab = img_ab / 128.  # Assuming ab in [-128, 128]
+        img_l = img_l / 255  # Assuming L in [0, 100]
+        img_ab = img_ab / 255  # Assuming ab in [-128, 128]
 
         # Convert to PyTorch tensors
         img_l = torch.from_numpy(img_l).float().unsqueeze(0)  # Shape: (1, 64, 64)

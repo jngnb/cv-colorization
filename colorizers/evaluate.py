@@ -6,6 +6,9 @@ from skimage import color
 from skimage.metrics import structural_similarity as ssim
 from torch.nn.functional import mse_loss
 import random
+from .util import *
+from skimage.color import lab2rgb
+import pdbp
 
 
 def calculate_psnr(img1, img2):
@@ -31,40 +34,58 @@ def evaluate_model_and_save_random_images(model, dataloader, device, output_fold
 
     with torch.no_grad():
         for i, (inputs, labels) in enumerate(dataloader):
+            
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
+            # print("Shape of outputs:", outputs.shape)
+            # print("Min and max of outputs:", outputs.min(), outputs.max())
             mse = mse_loss(outputs, labels)
             total_mse += mse.item()
 
-            outputs_np = outputs.cpu().numpy()
-            labels_np = labels.cpu().numpy()
+            outputs_np = outputs.cpu().numpy()[0]
+            labels_np = labels.cpu().numpy()[0]
+            outputs_np = outputs_np.transpose(1, 2, 0)
+            labels_np = labels_np.transpose(1, 2, 0)
 
-            batch_ssim = np.mean([ssim(out, lab, multichannel=True)
-                                 for out, lab in zip(outputs_np, labels_np)])
+            # batch_ssim = np.mean([ssim(out, lab, multichannel=True)
+            #                      for out, lab in zip(outputs_np, labels_np)])
+            batch_ssim = ssim(outputs_np, labels_np, channel_axis=2, multichannel=True, win_size=5, data_range=1)
             total_ssim += batch_ssim
 
             batch_psnr = np.mean([calculate_psnr(torch.tensor(out), torch.tensor(
                 lab)) for out, lab in zip(outputs_np, labels_np)])
             total_psnr += batch_psnr
 
+            # breakpoint()
+
+
             # Save images if in the random sample
             if i in sample_indices:
                 # Convert model's output to RGB and save the image
-                out_lab = np.concatenate((inputs.cpu().numpy().squeeze(
-                    1) * 100 + 50, outputs_np.squeeze(0) * 128), axis=0)
-                # Reorder dimensions to WxHxC
-                out_lab = out_lab.transpose(1, 2, 0)
-                out_rgb = color.lab2rgb(out_lab)
-                plt.imsave(os.path.join(output_folder,
-                           f'output_{i}.png'), out_rgb)
+                # breakpoint()
+
+                inputs = (inputs * 100)
+                outputs = (outputs * 255) - 128
+                out_rgb = postprocess_tens(inputs,outputs)
+                plt.imsave(os.path.join(output_folder, f'output_{i}.png'), out_rgb)
 
                 # Save corresponding ground truth image
-                gt_lab = np.concatenate((inputs.cpu().numpy().squeeze(
-                    1) * 100 + 50, labels_np.squeeze(0) * 128), axis=0)
-                gt_lab = gt_lab.transpose(1, 2, 0)
-                gt_rgb = color.lab2rgb(gt_lab)
+                labels = (labels * 255) - 128
+                gt_rgb = postprocess_tens(inputs, labels)
+                
+                print(f'gt_rgb: {gt_rgb.shape}')
+                # print(f'gt_rgb: {gt_rgb}')
+                print(f'gt_rgb c1: {gt_rgb[30,:,0]}')
+                print(f'gt_rgb c2: {gt_rgb[30,:,1]}')
+                print(f'gt_rgb c3: {gt_rgb[30,:,2]}')
                 plt.imsave(os.path.join(output_folder,
                            f'ground_truth_{i}.png'), gt_rgb)
+                
+                ##should be between -128 and 127
+                print(labels_np.min(), labels_np.max())
+                
+                ##should be between 0 and 1
+                print(out_rgb.min(), out_rgb.max())
 
     avg_mse = total_mse / num_batches
     avg_ssim = total_ssim / num_batches
