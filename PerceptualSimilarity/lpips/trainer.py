@@ -8,7 +8,7 @@ from collections import OrderedDict
 from torch.autograd import Variable
 from scipy.ndimage import zoom
 from tqdm import tqdm
-import PerceptualSimilarity.lpips
+import PerceptualSimilarity.lpips as lpips
 import os
 
 
