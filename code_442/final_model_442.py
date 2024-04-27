@@ -7,9 +7,9 @@ import torch.optim as optim
 from .lpips_loss_fn import lpips_loss
 from colorizers.base_color import *
 
-class ECCVGenerator(BaseColor):
+class ModelColorizer442(BaseColor):
     def __init__(self, norm_layer=nn.BatchNorm2d):
-        super(ECCVGenerator, self).__init__()
+        super(ModelColorizer442, self).__init__()
 
         model1=[nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1, bias=True),]
         model1+=[nn.ReLU(True),]
@@ -98,8 +98,8 @@ class ECCVGenerator(BaseColor):
 
         return self.unnormalize_ab(self.upsample4(out_reg))
 
-def eccv16(pretrained=True):
-	model = ECCVGenerator()
+def modelColorizer442(pretrained=True):
+	model = ModelColorizer442()
 	if(pretrained):
 		import torch.utils.model_zoo as model_zoo
 		model.load_state_dict(model_zoo.load_url('https://colorizers.s3.us-east-2.amazonaws.com/colorization_release_v2-9b330a0b.pth',map_location='cpu',check_hash=True))
@@ -123,12 +123,12 @@ def train_model_442(model, dataloader, epochs=10, learning_rate=0.001):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
-
+    
     # Define the loss function and optimizer
-    # criterion = torch.nn.L1Loss() 
+    criterion = torch.nn.L1Loss()
 
     # CUSTOM LOSS FUNCTION FOR 442 PROJECT
-    criterion = lpips_loss
+    # criterion = lpips_loss
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
