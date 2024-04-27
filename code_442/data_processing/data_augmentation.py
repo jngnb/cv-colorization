@@ -6,12 +6,12 @@ import cv2
 import matplotlib.pyplot as plt
 from skimage.color import lab2rgb
 
-images_gray = np.load('kaggle_images/l/gray_scale.npy')
+images_gray = np.load('raw_data/gray_scale.npy')
 image_gray = images_gray[0]
 print(image_gray)
-images_ab1 = np.load('kaggle_images/ab/ab/ab1.npy')
-images_ab2 = np.load('kaggle_images/ab/ab/ab2.npy')
-images_ab3 = np.load('kaggle_images/ab/ab/ab3.npy')
+images_ab1 = np.load('raw_data/ab1.npy')
+images_ab2 = np.load('raw_data/ab2.npy')
+images_ab3 = np.load('raw_data/ab3.npy')
 
 gray_array = []
 ab_array = []
