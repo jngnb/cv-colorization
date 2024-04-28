@@ -5,8 +5,8 @@ from sklearn.model_selection import train_test_split
 
 def data_split():
 
-    ABdata = np.load('data/true_color_downsampled/color.npy')
-    Ldata = np.load('data/grayscale_downsampled/grayscale.npy')
+    ABdata = np.load('data/true_color_downsample_aug/color.npy')
+    Ldata = np.load('data/grayscale_downsample_aug/grayscale.npy')
 
 
     print(f'Ldata content:  {Ldata[0, :, :]}')
@@ -39,9 +39,6 @@ def data_split():
     print(AB_test.shape)
 
 
-
-
-
     np.save('L_train.npy', L_train)
     np.save('L_test.npy', L_test)
     np.save('AB_train.npy', AB_train)
@@ -49,4 +46,3 @@ def data_split():
 
     print("successfully split")
     return L_train, L_test, AB_train, AB_test
-

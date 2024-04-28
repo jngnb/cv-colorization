@@ -1,42 +1,46 @@
 import torch
 from torchvision import transforms
 from PIL import Image
+import matplotlib.pyplot as plt
 
-def load_pretrained_model(model_path):
-    model = torch.load(model_path)
+# Assuming modelColorizer442 and ModelColorizer442 are defined as above or imported appropriately
+def load_model():
+    # Load the model
+    model = modelColorizer442(pretrained=True)
     model.eval()
     return model
 
+def prepare_image(image_path):
+    # Load the image
+    img = Image.open(image_path).convert("L")  # Convert image to grayscale
+    img = img.resize((64, 64))  # Resize to match model input
 
-def load_and_preprocess_image(image_path, target_size=(64, 64)):
-    # Load image
-    img = Image.open(image_path).convert('L')  # Convert image to grayscale
-    img = img.resize(target_size)
-
-    # Convert to tensor and normalize
+    # Transform the image to tensor
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5], std=[0.5])  # Example normalization, adjust if needed
+        transforms.ToTensor(),  # Convert image to tensor
+        transforms.Normalize((0.5,), (0.5,))  # Normalize the tensor
     ])
-    return transform(img).unsqueeze(0)
-def save_colorized_image(output, save_path):
-    # Assuming the output is a tensor with the AB channels and you have the L channel
-    # You would need to convert this to RGB
-    output = (output.squeeze().detach().numpy() * 255).astype('uint8')
-    Image.fromarray(output, 'RGB').save(save_path)
+    return transform(img).unsqueeze(0)  # Add batch dimension
 
+def colorize_image(model, input_tensor):
+    # Colorize the image
+    with torch.no_grad():
+        output = model(input_tensor)
+        return output
 
-def main(image_path, model_path, output_path):
-    model = load_pretrained_model(model_path)
+def save_image(output_tensor, output_path):
+    # Convert the output tensor to image
+    output_tensor = output_tensor.squeeze(0).cpu().detach()
+    img_out = torch.clamp(output_tensor, 0, 1)  # Clamp the output to valid image range
 
-    input_tensor = load_and_preprocess_image(image_path)
+    # Convert to PIL image and save
+    img_out_pil = transforms.ToPILImage()(img_out).convert("RGB")
+    img_out_pil.save(output_path)
 
-    #TODO: Have code here that runs the pre-trained model with input tensor
-
-    save_colorized_image(output, output_path)
-
-if __name__ == '__main__':
-    image_path = '.jpg'
-    model_path = '.pth'
-    output_path = 'path/to/save/colorized_image.jpg'
-    main(image_path, model_path, output_path)
+if __name__ == "__main__":
+    model = load_model()
+    #TODO: Make sure to change image.jpg to our image name
+    input_tensor = prepare_image("/code_442/inputIMG/image.jpg")
+    output_tensor = colorize_image(model, input_tensor)
+    
+    save_image(output_tensor, "/code_442/outputIMG/OUTPUTcolorized_image.jpg")

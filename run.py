@@ -21,20 +21,19 @@ L_train, L_test, AB_train, AB_test = data_split()
 # print(f'AB_train 30th row is {AB_train[0, 30, :, 0]}')
 # print(f'AB_test 30th row is {AB_test[0, 30, :, 0]}')
 
-
 train_dataset = LabDataset(L_train, AB_train)
 train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=False)
 
 # load colorizers
-colorizer_eccv16 = eccv16(pretrained=False)
+colorizer_442 = final_model_442.modelColorizer442(pretrained=False)
 if opt.use_gpu:
-	colorizer_eccv16.cuda()
+	colorizer_442.cuda()
 	
 # Train the model
-final_model_442.train_model_442(colorizer_eccv16, train_dataloader, 10)
+final_model_442.train_model_442(colorizer_442, train_dataloader, 10)
 
-colorizer_eccv16.load_state_dict(torch.load("model/model_state_dict.pth"))
-colorizer_eccv16.eval()
+colorizer_442.load_state_dict(torch.load("model/model_state_dict.pth"))
+colorizer_442.eval()
 
 
 # Ensure the output directory exists
@@ -49,9 +48,9 @@ test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # Ensure model is in evaluation mode and on the correct device
 device = "cuda" if opt.use_gpu and torch.cuda.is_available() else "cpu"
-colorizer_eccv16.to(device)
-colorizer_eccv16.eval()
+colorizer_442.to(device)
+colorizer_442.eval()
 
 
-avg_mse, avg_ssim, avg_psnr = evaluate_model_and_save_random_images(colorizer_eccv16, test_dataloader, device, output_dir)
+avg_mse, avg_ssim, avg_psnr = evaluate_model_and_save_random_images(colorizer_442, test_dataloader, device, output_dir)
 print(f"Average MSE: {avg_mse}, Average SSIM: {avg_ssim}, Average PSNR: {avg_psnr}")
