@@ -9,94 +9,88 @@ from colorizers.base_color import *
 
 class ModelColorizer442(BaseColor):
     def __init__(self, norm_layer=nn.BatchNorm2d):
-        super(ModelColorizer442, self).__init__()
+        super().__init__()
+        # Layer Model 1: Input is grayscale images of size [batch_size, 1, 64, 64]
+        self.model1 = nn.Sequential(
+            # Output: [batch_size, 64, 64, 64]
+            nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 64, 32, 32]
+            nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(True),
+            norm_layer(64)
+        )
 
-        model1=[nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1, bias=True),]
-        model1+=[nn.ReLU(True),]
-        model1+=[nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1, bias=True),]
-        model1+=[nn.ReLU(True),]
-        model1+=[norm_layer(64),]
+        # Layer Model 2: Increases channel depth while maintaining dimension
+        self.model2 = nn.Sequential(
+            # Output: [batch_size, 128, 32, 32]
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 128, 32, 32]
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(128)
+        )
 
-        model2=[nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=True),]
-        model2+=[nn.ReLU(True),]
-        model2+=[nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=1, bias=True),]
-        model2+=[nn.ReLU(True),]
-        model2+=[norm_layer(128),]
+        # Layer Model 3: Further increases channel depth
+        self.model3 = nn.Sequential(
+            # Output: [batch_size, 256, 32, 32]
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 256, 32, 32]
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(256)
+        )
 
-        model3=[nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1, bias=True),]
-        model3+=[nn.ReLU(True),]
-        model3+=[nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=True),]
-        model3+=[nn.ReLU(True),]
-        model3+=[nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=True),]
-        model3+=[nn.ReLU(True),]
-        model3+=[norm_layer(256),]
+        # Layer Model 4: Maintains the high channel depth
+        self.model4 = nn.Sequential(
+            # Output: [batch_size, 512, 32, 32]
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(512),
+            # Output: [batch_size, 512, 32, 32]
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(512)
+        )
 
-        model4=[nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model4+=[nn.ReLU(True),]
-        model4+=[nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model4+=[nn.ReLU(True),]
-        model4+=[nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model4+=[nn.ReLU(True),]
-        model4+=[norm_layer(512),]
-
-        model5=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model5+=[nn.ReLU(True),]
-        model5+=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model5+=[nn.ReLU(True),]
-        model5+=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model5+=[nn.ReLU(True),]
-        model5+=[norm_layer(512),]
-
-        model6=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model6+=[nn.ReLU(True),]
-        model6+=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model6+=[nn.ReLU(True),]
-        model6+=[nn.Conv2d(512, 512, kernel_size=3, dilation=2, stride=1, padding=2, bias=True),]
-        model6+=[nn.ReLU(True),]
-        model6+=[norm_layer(512),]
-
-        model7=[nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model7+=[nn.ReLU(True),]
-        model7+=[nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model7+=[nn.ReLU(True),]
-        model7+=[nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=True),]
-        model7+=[nn.ReLU(True),]
-        model7+=[norm_layer(512),]
-
-        model8=[nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=1, bias=True),]
-        model8+=[nn.ReLU(True),]
-        model8+=[nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=True),]
-        model8+=[nn.ReLU(True),]
-        model8+=[nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=True),]
-        model8+=[nn.ReLU(True),]
-
-        model8+=[nn.Conv2d(256, 313, kernel_size=1, stride=1, padding=0, bias=True),]
-
-        self.model1 = nn.Sequential(*model1)
-        self.model2 = nn.Sequential(*model2)
-        self.model3 = nn.Sequential(*model3)
-        self.model4 = nn.Sequential(*model4)
-        self.model5 = nn.Sequential(*model5)
-        self.model6 = nn.Sequential(*model6)
-        self.model7 = nn.Sequential(*model7)
-        self.model8 = nn.Sequential(*model8)
-
+        # Layer Model 5: Continues processing at the same resolution and channel depth
+        self.model5 = nn.Sequential(
+            # Output: [batch_size, 512, 32, 32]
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(512),
+            # Output: [batch_size, 512, 32, 32]
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            norm_layer(512)
+        )
         self.softmax = nn.Softmax(dim=1)
-        self.model_out = nn.Conv2d(313, 2, kernel_size=1, padding=0, dilation=1, stride=1, bias=False)
-        self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
 
-    def forward(self, input_l):
-        conv1_2 = self.model1(self.normalize_l(input_l))
-        conv2_2 = self.model2(conv1_2)
-        conv3_3 = self.model3(conv2_2)
-        conv4_3 = self.model4(conv3_3)
-        conv5_3 = self.model5(conv4_3)
-        conv6_3 = self.model6(conv5_3)
-        conv7_3 = self.model7(conv6_3)
-        conv8_3 = self.model8(conv7_3)
-        out_reg = self.model_out(self.softmax(conv8_3))
+        # Upsampling layers to restore the original image size with a final channel depth for colorization
+        self.upsample = nn.Sequential(
+            # Output: [batch_size, 256, 64, 64]
+            nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 128, 64, 64]
+            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 64, 64, 64]
+            nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(True),
+            # Output: [batch_size, 2, 64, 64]
+            nn.Conv2d(64, 2, kernel_size=3, stride=1, padding=1)
+        )
 
-        return self.unnormalize_ab(self.upsample4(out_reg))
+    def forward(self, x):
+        x = self.model1(x)
+        x = self.model2(x)
+        x = self.model3(x)
+        x = self.model4(x)
+        x = self.model5(x)
+        x = self.upsample(self.softmax(x))
+        return self.unnormalize_ab(x)
 
 def modelColorizer442(pretrained=True):
 	model = ModelColorizer442()
@@ -125,10 +119,10 @@ def train_model_442(model, dataloader, epochs=10, learning_rate=0.001):
     model.to(device)
     
     # Define the loss function and optimizer
-    criterion = torch.nn.L1Loss()
+    # criterion = torch.nn.L1Loss()
 
     # CUSTOM LOSS FUNCTION FOR 442 PROJECT
-    # criterion = lpips_loss
+    criterion = lpips_loss
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
